@@ -1,4 +1,16 @@
-hash: c662904f97c9c1685d37349a1514c8ecfa0a5fa88169f1bd80b366e8321556f9
-updated: 2017-10-15T19:08:42.332134903+09:00
-imports: []
+hash: 13841835b0b4a70f33c7e24753479d79ea8b7e8b736c4add5b987bc6ab1f8710
+updated: 2017-10-16T00:40:31.100102591+09:00
+imports:
+- name: github.com/ieee0824/getenv
+  version: c0967c2a6018ada0a7537084588ee1e5084b09ac
+- name: github.com/ieee0824/sakuya
+  version: dfa6438ac8206221e271772240346c97c8e0d74d
+- name: github.com/joho/godotenv
+  version: a79fa1e548e2c689c241d10173efd51e5d689d5b
+- name: github.com/nlopes/slack
+  version: 5cde21b8b96a43fc3435a1f514123d14fd7eabdc
+- name: golang.org/x/net
+  version: a04bdaca5b32abe1c069418fb7088ae607de5bd0
+  subpackages:
+  - websocket
 testImports: []
