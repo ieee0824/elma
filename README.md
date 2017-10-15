@@ -1,9 +1,10 @@
 # elma
-elma is simple outline monitoring.
+elma is simple outline monitoring tool.
 
 # configure
 
-```[
+```
+[
   {
     "target": "http://example.com",
     "rate": "5s"
