@@ -18,22 +18,23 @@ type Result struct {
 	Error error `json:"error"`
 	healthyStatusCode []int
 	Edge bool `json:"edge"`
+	target string
 }
 
 func (r Result) String() string {
 	err := r.IsHealthy()
 	if  err == nil {
-		return "healthy"
+		return fmt.Sprintf("%v: healthy, status: %v, target: %v", r.Time.Format("2006/01/02 15:04:05 MST"), r.Resp.StatusCode, r.target)
 	}
-	return fmt.Sprintf("unhealth: %v", err.Error())
+	return fmt.Sprintf("%v: unhealthy: status:%v, error: %v, target: %v", r.Time.Format("2006/01/02 15:04:05 MST"), r.Resp.StatusCode, err.Error(), r.target)
 }
 
 func (r *Result) IsHealthy() error {
-	if r.Resp == nil {
-		return errors.New("response is nil")
-	}
 	if r.Error != nil {
 		return r.Error
+	}
+	if r.Resp == nil {
+		return errors.New("response is nil")
 	}
 
 	for _, c := range r.healthyStatusCode {
@@ -156,6 +157,7 @@ func (c *Client) Monitoring() (chan *Result) {
 					err,
 					c.healthyStatusCode,
 					false,
+					c.target,
 				}
 				if c.before != nil {
 					result.Edge = *c.before != (result.IsHealthy() == nil)
