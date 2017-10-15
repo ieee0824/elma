@@ -19,12 +19,13 @@ type Result struct {
 	healthyStatusCode []int
 	Edge bool `json:"edge"`
 	target string
+	ResponseTime time.Duration
 }
 
 func (r Result) String() string {
 	err := r.IsHealthy()
 	if  err == nil {
-		return fmt.Sprintf("%v: healthy, status: %v, target: %v", r.Time.Format("2006/01/02 15:04:05 MST"), r.Resp.StatusCode, r.target)
+		return fmt.Sprintf("%v: healthy, status: %v, target: %v, response time: %v", r.Time.Format("2006/01/02 15:04:05 MST"), r.Resp.StatusCode, r.target, r.ResponseTime.String())
 	}
 	return fmt.Sprintf("%v: unhealthy: status:%v, error: %v, target: %v", r.Time.Format("2006/01/02 15:04:05 MST"), r.Resp.StatusCode, err.Error(), r.target)
 }
@@ -150,7 +151,9 @@ func (c *Client) Monitoring() (chan *Result) {
 		for {
 			select {
 			case <-t.C:
+				start := time.Now()
 				resp, err := c.client.Do(c.request)
+				end := time.Now()
 				result := Result{
 					resp,
 					time.Now(),
@@ -158,6 +161,7 @@ func (c *Client) Monitoring() (chan *Result) {
 					c.healthyStatusCode,
 					false,
 					c.target,
+					end.Sub(start),
 				}
 				if c.before != nil {
 					result.Edge = *c.before != (result.IsHealthy() == nil)
