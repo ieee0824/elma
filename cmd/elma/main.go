@@ -11,6 +11,7 @@ import (
 	"github.com/ieee0824/getenv"
 	"image/color"
 	"github.com/joho/godotenv"
+	"time"
 )
 
 var (
@@ -45,17 +46,19 @@ func main() {
 	killer := make(chan bool)
 	configPath = flag.String("f", "", "conf path")
 	flag.Parse()
+
 	slackClient := sakuya.New(getenv.String("SLACK_API_KEY"), getenv.String("CHANNEL"), "", getenv.String("SLACK_NAME"))
 	slackClient.SetIconURL(getenv.String("ICON_URL"))
-
 
 	configs, err := readConfig()
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	for _, config := range configs {
-		go func() {
+	for i, config := range configs {
+		go func(i int, config elma.ClientSetting) {
+			time.Sleep(time.Duration(i)*time.Second)
+
 			client := config.Client()
 			if client == nil {
 				killer <- true
@@ -72,7 +75,7 @@ func main() {
 					post(slackClient, result)
 				}
 			}
-		}()
+		}(i, config)
 	}
 
 	<-killer
