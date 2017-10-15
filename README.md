@@ -1,4 +1,5 @@
 # elma
+elma is simple outline monitoring.
 
 # configure
 
