@@ -7,6 +7,10 @@ import (
 	"encoding/json"
 	"log"
 	"io"
+	"github.com/ieee0824/sakuya"
+	"github.com/ieee0824/getenv"
+	"image/color"
+	"github.com/joho/godotenv"
 )
 
 var (
@@ -37,9 +41,13 @@ func post(w io.Writer, r *elma.Result) error {
 }
 
 func main() {
+	godotenv.Load(".env")
 	killer := make(chan bool)
 	configPath = flag.String("f", "", "conf path")
 	flag.Parse()
+	slackClient := sakuya.New(getenv.String("SLACK_API_KEY"), getenv.String("CHANNEL"), "", getenv.String("SLACK_NAME"))
+	slackClient.SetIconURL(getenv.String("ICON_URL"))
+
 
 	configs, err := readConfig()
 	if err != nil {
@@ -55,7 +63,14 @@ func main() {
 			}
 			r := client.Monitoring()
 			for {
-				post(os.Stdout, <-r)
+				result := <- r
+				if result.IsHealthy() == nil {
+					slackClient.SetColor(color.RGBA{0x00, 0xff, 0x00, 0xff})
+					post(slackClient, result)
+				} else {
+					slackClient.SetColor(color.RGBA{0xff, 0x00, 0x00, 0xff})
+					post(slackClient, result)
+				}
 			}
 		}()
 	}

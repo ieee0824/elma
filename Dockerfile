@@ -10,6 +10,11 @@ RUN set -e \
 
 FROM alpine:latest
 
+RUN apk --update upgrade && \
+    apk add curl ca-certificates && \
+    update-ca-certificates && \
+    rm -rf /var/cache/apk/*
+
 COPY --from=build /go/src/github.com/ieee0824/elma/cmd/elma/elma /bin/elma
 
 CMD ["elma", "-f", "/tmp/config.json"]
